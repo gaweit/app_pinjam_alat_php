@@ -110,9 +110,26 @@ include "config/koneksi.php" ?>
                      $sql = "SELECT peminjaman.id_peminjaman, peminjaman.status, peminjaman.penerima, peminjaman.denda, peminjaman.id_anggota, peminjaman.kode_brg, peminjaman.tgl_pinjam, peminjaman.deadline, peminjaman.jumlah, barang.nama_brg, anggota.nama FROM peminjaman JOIN barang ON peminjaman.id_brg=barang.id_brg JOIN anggota ON anggota.id_anggota=peminjaman.id_anggota ORDER BY peminjaman.id_peminjaman DESC";
                      $query = $mysqli->query($sql);
                      $no = 1; 
-                     
+                  date_default_timezone_set("Asia/Jakarta");
+
+
                      while ($lihat=mysqli_fetch_array($query)){
-                      ?>
+
+          $hari = date('d', strtotime($lihat['deadline']));
+          $hari_ini = date('d');
+$selisih_hari = $hari_ini-$hari;
+$posisi = preg_match("/-/i", $selisih_hari);
+
+if($posisi){ 
+
+  $selisih_hari = 0;
+  $jumlah_denda = "Belum Denda";
+}else{
+
+  $jumlah_denda = str_replace('-', '', $selisih_hari *1000);
+   }
+
+ ?>
                       <tbody>
                         <tr>
                          <td><?php echo $no++ ?></td>
@@ -124,7 +141,11 @@ include "config/koneksi.php" ?>
                           <td><?php echo $lihat ['jumlah']; ?></td>
                           <td><span class="btn btn-xs btn-<?php echo $lihat['status'] == 1 ? 'success' : 'danger' ?>"><?php echo $lihat['status'] == 1 ? 'Sudah Dikembalikan' : 'Belum Dikembalikan'; ?></span></td>
                           <td><?php echo $lihat ['penerima']; ?></td>
-                          <td><?php echo $lihat ['denda']; ?></td>
+                          <td><?php //echo $lihat ['denda']; ?> <?php 
+echo $selisih_hari." Hari";
+
+?> || <?php 
+echo $jumlah_denda;?></td>
                           <td> <a href="editpeminjaman.php?id_peminjaman=<?php echo $lihat['id_peminjaman']; ?>" class="btn btn-primary">Edit</a>
                           <a href="hapuspeminjaman.php?id=<?php echo $lihat['id_peminjaman']; ?>" class="btn btn-danger">Hapus</a></td>
 
